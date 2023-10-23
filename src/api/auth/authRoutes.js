@@ -24,8 +24,6 @@ import {
 
 import { ensureAuthenticated } from '../../middleware/authMiddleware.js';
 
-// prettier-ignore
-
 const router = Router();
 
 router.post('/register', registerUserValidator, registerUser);
