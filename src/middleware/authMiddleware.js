@@ -21,10 +21,10 @@ export const ensureAuthenticated = asyncHandler(async (req, res, next) => {
 
 export const ensureAuthorized = (roles) => {
   return asyncHandler(async (req, res, next) => {
-    const authorized = roles.some((role) => req.user?.role.includes(role));
+    const authorized = roles.some((role) => req.user.role.includes(role));
     if (!authorized)
       throw new createError.Forbidden(
-        `you dont have permission to perform this action`
+        `you do not have permission to perform this action`
       );
     next();
   });

@@ -4,7 +4,6 @@ import { StatusCodes } from 'http-status-codes';
 import User from './userModel.js';
 import { asyncHandler } from '../../utils/helper.js';
 import { USER_ROLES } from './userConstants.js';
-import { USER_MESSAGES } from './userConstants.js';
 
 // @ Get All Users
 // @ GET /api/v1/users
