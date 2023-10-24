@@ -1,26 +1,24 @@
 import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
+import jwtConfig from '../../config/jwt.js';
 
 export const generateAccessAndRefreshTokens = (user) => {
   const { _id, name, role } = user;
   const accessTokenPayload = { _id, name, role };
   const refreshTokenPayload = { _id };
 
-  // prettier-ignore
-  const {JWT_ACCESS_TOKEN_SECRET_KEY, JWT_REFRESH_TOKEN_SECRET_KEY} = process.env
-
   const accessToken = jwt.sign(
     accessTokenPayload,
-    JWT_ACCESS_TOKEN_SECRET_KEY,
+    jwtConfig.accessTokenSecret,
     {
-      expiresIn: '15m',
+      expiresIn: jwtConfig.accessTokenExpire,
     }
   );
   const refreshToken = jwt.sign(
     refreshTokenPayload,
-    JWT_REFRESH_TOKEN_SECRET_KEY,
+    jwtConfig.refreshTokenSecret,
     {
-      expiresIn: '24h',
+      expiresIn: jwtConfig.refreshTokenExpire,
     }
   );
   return { accessToken, refreshToken };
