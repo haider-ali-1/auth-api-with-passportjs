@@ -1,6 +1,6 @@
 import ms from 'ms';
 
-export default {
+export const jwtConfig = {
   accessTokenSecret:
     'e6df113a787f434bdcd5119e758b617d851c6cb8bb2074f4d4bcf75277bca59c',
   refreshTokenSecret:

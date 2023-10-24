@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import User from '../user/userModel.js';
 import { asyncHandler } from '../../utils/helper.js';
 import { sendEmail } from '../../services/emailService.js';
+import { jwtConfig } from '../../config/jwt.js';
 import {
   generateAccessAndRefreshTokens,
   generateCryptoToken,
@@ -23,7 +24,7 @@ export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
   user.refreshTokens = [...user.refreshTokens, refreshToken];
   await user.save();
 
-  setCookie(res, 'jwt', refreshToken, 24 * 60 * 60 * 1000);
+  setCookie(res, 'jwt', refreshToken, jwtConfig.refreshTokenExpire);
   res
     .status(StatusCodes.OK)
     .redirect(`http://localhost:5000/dashboard?${accessToken}`);

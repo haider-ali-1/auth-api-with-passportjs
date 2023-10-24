@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
-import jwtConfig from '../../config/jwt.js';
+import { jwtConfig } from '../../config/jwt.js';
 
 export const generateAccessAndRefreshTokens = (user) => {
   const { _id, name, role } = user;
