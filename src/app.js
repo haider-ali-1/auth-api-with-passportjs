@@ -30,6 +30,11 @@ app.all('*', notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 app.listen(PORT, async () => {
-  await connectWithDatabase();
-  console.log(`server is running at http://localhost:${PORT}`);
+  try {
+    await connectWithDatabase();
+    console.log('connected with database successfully');
+    console.log(`server is running at http://localhost:${PORT}`);
+  } catch (error) {
+    console.log(error);
+  }
 });
