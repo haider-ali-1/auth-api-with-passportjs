@@ -1,5 +1,3 @@
 import { transporter } from '../config/nodemailer.js';
 
-export const sendEmail = async (mailOptions) => {
-  return transporter.sendMail(mailOptions);
-};
+export const sendEmail = (mailOptions) => transporter.sendMail(mailOptions);
