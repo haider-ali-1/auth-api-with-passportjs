@@ -13,6 +13,7 @@ import {
   setCookie,
   clearCookie,
 } from './authHelper.js';
+import { USER_REGISTER_METHODS } from '../user/userConstants.js';
 
 // handle OAuth login
 export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
@@ -36,7 +37,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email });
 
-  if (user) {
+  if (user?.registerMethod !== USER_REGISTER_METHODS.EMAIL_PASSWORD) {
     throw new createError.Conflict(
       `you already signup using ${user.registerMethod} please use option continue with ${user.registerMethod} for login`
     );
@@ -61,7 +62,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
     const mailOptions = {
       from: '<admin@authAPI.com>',
-      to: user.email,
+      to: email,
       subject: 'email verification',
       text: message,
     };
