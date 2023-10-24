@@ -59,7 +59,7 @@ export const errorHandlerMiddleware = (err, req, res, next) => {
     const key = Object.keys(err.keyValue)[0];
     const value = err.keyValue[key];
     statusCode = StatusCodes.CONFLICT;
-    message = `invalid input data`;
+    message = `${key} already exists`;
     errors = [{ field: key, message: `${key} already exists`, value }];
   }
 
