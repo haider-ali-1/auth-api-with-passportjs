@@ -1,3 +1,9 @@
 import { transporter } from '../config/nodemailer.js';
 
-export const sendEmail = (mailOptions) => transporter.sendMail(mailOptions);
+export const sendEmail = async (mailOptions) => {
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.log(error);
+  }
+};

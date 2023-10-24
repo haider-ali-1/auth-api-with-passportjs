@@ -1,3 +1,4 @@
+import ms from 'ms';
 import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 import { StatusCodes } from 'http-status-codes';
@@ -15,10 +16,7 @@ import {
 
 // handle OAuth login
 export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user._id);
-
-  if (!user) throw new createError.NotFound(`user does not exist`);
-
+  const user = req.user;
   const { accessToken, refreshToken } = generateAccessAndRefreshTokens(user);
 
   user.refreshTokens = [...user.refreshTokens, refreshToken];
@@ -36,19 +34,25 @@ export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
 export const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
 
+  const user = await User.findOne({ email });
+
+  if (user) {
+    throw new createError.Conflict(
+      `you already signup using ${user.registerMethod} please use option continue with ${user.registerMethod} for login`
+    );
+  }
+
   // set role admin for first user register
   const role = (await User.countDocuments()) === 0 ? ['admin'] : ['user'];
-
   const { token, hashedToken } = generateCryptoToken();
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-    role,
-    emailVerificationToken: hashedToken,
-    emailVerificationTokenExpireAt: Date.now() + 15 * 60 * 1000, // 15 minutes
-  });
+  const newUser = new User();
+  newUser.name = name;
+  newUser.email = email;
+  newUser.password = password;
+  newUser.role = role;
+  newUser.emailVerificationToken = hashedToken;
+  newUser.emailVerificationTokenExpireAt = Date.now() + ms('15m');
 
   try {
     // prettier-ignore
@@ -63,6 +67,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     };
 
     await sendEmail(mailOptions);
+    await newUser.save();
   } catch (error) {
     throw new createError.InternalServerError('failed to send email');
   }

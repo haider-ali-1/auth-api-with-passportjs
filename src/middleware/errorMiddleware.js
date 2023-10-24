@@ -4,6 +4,8 @@ import createError from 'http-errors';
 import mongoose from 'mongoose';
 
 export const errorHandlerMiddleware = (err, req, res, next) => {
+  console.log(err);
+
   const { HttpError: expressVlidatorError } = createError;
   const { TokenExpiredError, JsonWebTokenError } = jwt;
   const { CastError, ValidationError } = mongoose.Error;
