@@ -15,7 +15,37 @@ import {
 } from './authHelper.js';
 import { USER_REGISTER_METHODS } from '../user/userConstants.js';
 
-// handle OAuth login
+// handle OAuth Signup
+export const handleOAuthSignup = async (profile, done) => {
+  const { provider, id } = profile;
+  const { name, picture, email, email_verified } = profile._json;
+
+  let user = await User.findOne({ email });
+
+  if (user) {
+    if (user.registerMethod === USER_REGISTER_METHODS.EMAIL_PASSWORD) {
+      const error = new createError.Conflict(
+        `you had signed up using email and password please use email & password for login`
+      );
+      done(error);
+    }
+
+    done(null, user);
+  } else {
+    user = await User.create({
+      name,
+      email,
+      registerMethod: provider,
+      [`${provider}Id`]: id,
+      profileImage: picture,
+      provider,
+      isVerified: email_verified,
+    });
+    done(null, user);
+  }
+};
+
+// handle OAuth Login
 export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
   const user = req.user;
   const { accessToken, refreshToken } = generateAccessAndRefreshTokens(user);
