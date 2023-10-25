@@ -53,7 +53,7 @@ export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
   user.refreshTokens = [...user.refreshTokens, refreshToken];
   await user.save();
 
-  setCookie(res, 'jwt', refreshToken, config.refreshTokenExpireTime);
+  setCookie(res, 'jwt', refreshToken, config.REFRESH_TOKEN_EXPIRE_TIME);
   res
     .status(StatusCodes.OK)
     .redirect(`http://localhost:5000/dashboard?${accessToken}`);
@@ -78,7 +78,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     role,
     emailVerificationToken: hashedToken,
     emailVerificationTokenExpireAt:
-      Date.now() + config.emailVerificationTokenExpireTime,
+      Date.now() + config.EMAIL_VERIFICATION_TOKEN_EXPIRE_TIME,
   });
 
   const verificationURL = `${req.protocol}://${req.get('host')}${
@@ -116,7 +116,7 @@ export const resendEmail = asyncHandler(async (req, res, next) => {
 
   user.emailVerificationToken = hashedToken;
   user.emailVerificationTokenExpireAt =
-    Date.now() + config.emailVerificationTokenExpireTime;
+    Date.now() + config.EMAIL_VERIFICATION_TOKEN_EXPIRE_TIME;
   await user.save();
 
   try {
@@ -186,7 +186,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 
   user.refreshTokens = [...user.refreshTokens, refreshToken];
   await user.save();
-  setCookie(res, 'jwt', refreshToken, config.refreshTokenExpireTime); // 24 hours
+  setCookie(res, 'jwt', refreshToken, config.REFRESH_TOKEN_EXPIRE_TIME); // 24 hours
 
   res.status(StatusCodes.OK).json({
     status: 'success',
@@ -252,7 +252,7 @@ export const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
   await user.save();
 
-  setCookie(res, 'jwt', refreshToken, config.refreshTokenExpireTime);
+  setCookie(res, 'jwt', refreshToken, config.REFRESH_TOKEN_EXPIRE_TIME);
   res.status(StatusCodes.OK).json({ status: 'success', accessToken });
 });
 
@@ -291,7 +291,7 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
 
     user.passwordResetToken = hashedToken;
     user.passwordResetTokenExpireAt =
-      Date.now() + config.passwordResetTokenExpireTime; // 15 minutes
+      Date.now() + config.PASSWORD_RESET_TOKEN_EXPIRE_TIME; // 15 minutes
 
     await user.save();
     await sendEmail(mailOptions);

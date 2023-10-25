@@ -1,8 +1,8 @@
 import ms from 'ms';
 
 export default {
-  accessTokenExpireTime: ms('15m'),
-  refreshTokenExpireTime: ms('24h'),
-  emailVerificationTokenExpireTime: ms('30m'),
-  passwordResetTokenExpireTime: ms('30m'),
+  ACCESS_TOKEN_EXPIRE_TIME: ms('15m'),
+  REFRESH_TOKEN_EXPIRE_TIME: ms('24h'),
+  EMAIL_VERIFICATION_TOKEN_EXPIRE_TIME: ms('30m'),
+  PASSWORD_RESET_TOKEN_EXPIRE_TIME: ms('30m'),
 };

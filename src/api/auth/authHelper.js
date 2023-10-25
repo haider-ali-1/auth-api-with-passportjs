@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
+import config from '../../config/config.js';
 
 export const generateAccessAndRefreshTokens = (user) => {
   const { _id, name, role } = user;
@@ -10,14 +11,14 @@ export const generateAccessAndRefreshTokens = (user) => {
     accessTokenPayload,
     process.env.JWT_ACCESS_TOKEN_SECRET,
     {
-      expiresIn: jwtConfig.accessTokenExpire,
+      expiresIn: config.ACCESS_TOKEN_EXPIRE_TIME,
     }
   );
   const refreshToken = jwt.sign(
     refreshTokenPayload,
     process.env.JWT_REFRESH_TOKEN_SECRET,
     {
-      expiresIn: jwtConfig.refreshTokenExpire,
+      expiresIn: config.REFRESH_TOKEN_EXPIRE_TIME,
     }
   );
   return { accessToken, refreshToken };
