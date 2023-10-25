@@ -8,11 +8,12 @@ import { connectWithDatabase } from './config/database.js';
 import { notFoundMiddleware } from './middleware/notFoundMiddleware.js';
 import { errorHandlerMiddleware } from './middleware/errorMiddleware.js';
 
+import config from './config/config.js';
 import { router as authRouter } from './api/auth/authRoutes.js';
 import { router as userRouter } from './api/user/userRoutes.js';
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = config.PORT || 5001;
 
 app.use(passport.initialize());
 app.use(express.json());
