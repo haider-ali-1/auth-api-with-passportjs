@@ -3,7 +3,7 @@ export const USER_ROLES = {
   ADMIN: 'admin',
 };
 
-export const AUTH_PROVIDERS = {
+export const USER_REGISTER_METHODS = {
   GOOGLE: 'google',
   FACEBOOK: 'facebook',
   EMAIL_PASSWORD: 'email_password',
