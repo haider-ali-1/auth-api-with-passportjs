@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import User from '../user/userModel.js';
 import { asyncHandler } from '../../utils/helper.js';
 import { sendEmail } from '../../services/emailService.js';
-import { jwtConfig } from '../../config/jwt.js';
+import config from '../../config/config.js';
 import {
   generateAccessAndRefreshTokens,
   generateCryptoToken,
@@ -53,7 +53,7 @@ export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
   user.refreshTokens = [...user.refreshTokens, refreshToken];
   await user.save();
 
-  setCookie(res, 'jwt', refreshToken, jwtConfig.refreshTokenExpire);
+  setCookie(res, 'jwt', refreshToken, config.refreshTokenExpireTime);
   res
     .status(StatusCodes.OK)
     .redirect(`http://localhost:5000/dashboard?${accessToken}`);
@@ -77,7 +77,8 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     password,
     role,
     emailVerificationToken: hashedToken,
-    emailVerificationTokenExpireAt: Date.now() + ms('15m'),
+    emailVerificationTokenExpireAt:
+      Date.now() + config.emailVerificationTokenExpireTime,
   });
 
   const verificationURL = `${req.protocol}://${req.get('host')}${
@@ -114,7 +115,8 @@ export const resendEmail = asyncHandler(async (req, res, next) => {
   const { token, hashedToken } = generateCryptoToken();
 
   user.emailVerificationToken = hashedToken;
-  user.emailVerificationTokenExpireAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+  user.emailVerificationTokenExpireAt =
+    Date.now() + config.emailVerificationTokenExpireTime;
   await user.save();
 
   try {
@@ -184,7 +186,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 
   user.refreshTokens = [...user.refreshTokens, refreshToken];
   await user.save();
-  setCookie(res, 'jwt', refreshToken, 24 * 60 * 60 * 1000); // 24 hours
+  setCookie(res, 'jwt', refreshToken, config.refreshTokenExpireTime); // 24 hours
 
   res.status(StatusCodes.OK).json({
     status: 'success',
@@ -250,7 +252,7 @@ export const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
   await user.save();
 
-  setCookie(res, 'jwt', refreshToken, 24 * 60 * 60 * 1000);
+  setCookie(res, 'jwt', refreshToken, config.refreshTokenExpireTime);
   res.status(StatusCodes.OK).json({ status: 'success', accessToken });
 });
 
@@ -288,7 +290,8 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
     };
 
     user.passwordResetToken = hashedToken;
-    user.passwordResetTokenExpireAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+    user.passwordResetTokenExpireAt =
+      Date.now() + config.passwordResetTokenExpireTime; // 15 minutes
 
     await user.save();
     await sendEmail(mailOptions);
