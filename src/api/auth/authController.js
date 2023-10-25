@@ -34,44 +34,35 @@ export const handleOAuthLogin = asyncHandler(async (req, res, next) => {
 
 export const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
+  const role = (await User.countDocuments()) === 0 ? ['admin'] : ['user'];
 
-  const user = await User.findOne({ email });
-
-  if (user?.registerMethod !== USER_REGISTER_METHODS.EMAIL_PASSWORD) {
-    throw new createError.Conflict(
-      `you already signup using ${user.registerMethod} please use option continue with ${user.registerMethod} for login`
-    );
-  }
+  // const user = await User.findOne({ email });
 
   // set role admin for first user register
-  const role = (await User.countDocuments()) === 0 ? ['admin'] : ['user'];
   const { token, hashedToken } = generateCryptoToken();
 
-  const newUser = new User();
-  newUser.name = name;
-  newUser.email = email;
-  newUser.password = password;
-  newUser.role = role;
-  newUser.emailVerificationToken = hashedToken;
-  newUser.emailVerificationTokenExpireAt = Date.now() + ms('15m');
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role,
+    emailVerificationToken: hashedToken,
+    emailVerificationTokenExpireAt: Date.now() + ms('15m'),
+  });
 
-  try {
-    // prettier-ignore
-    const verificationURL = `${req.protocol}://${req.get('host')}${req.baseUrl}/verify-email/${token}`
-    const message = `please click on the below link for email verification\n${verificationURL}\nlink will expire after 15 minutes`;
+  const verificationURL = `${req.protocol}://${req.get('host')}${
+    req.baseUrl
+  }/verify-email/${token}`;
+  const message = `please click on the below link for email verification\n${verificationURL}\nlink will expire after 15 minutes`;
 
-    const mailOptions = {
-      from: '<admin@authAPI.com>',
-      to: email,
-      subject: 'email verification',
-      text: message,
-    };
+  const mailOptions = {
+    from: '<admin@authAPI.com>',
+    to: user.email,
+    subject: 'email verification',
+    text: message,
+  };
 
-    await sendEmail(mailOptions);
-    await newUser.save();
-  } catch (error) {
-    throw new createError.InternalServerError('failed to send email');
-  }
+  await sendEmail(mailOptions);
 
   res.status(StatusCodes.CREATED).json({
     status: 'success',
@@ -241,7 +232,15 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email });
 
-  if (!user) throw new createError.NotFound('user does not exist');
+  if (user) {
+    if (user.registerMethod !== USER_REGISTER_METHODS.EMAIL_PASSWORD) {
+      throw new createError.BadRequest(
+        `you had signed up using ${user.registerMethod} please use continue with ${user.registerMethod} for login`
+      );
+    }
+  } else {
+    throw new createError.NotFound('user does not exist');
+  }
 
   // send email for password reset
   try {
@@ -296,6 +295,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   user.passwordResetToken = undefined;
   user.passwordResetTokenExpireAt = undefined;
   await user.save();
+
   res.status(StatusCodes.OK).json({
     status: 'success',
     message: 'your password has been reset successfully',

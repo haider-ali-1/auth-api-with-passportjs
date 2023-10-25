@@ -1,14 +1,19 @@
 import nodemailer from 'nodemailer';
 
-const { EMAIL_HOST, EMAIL_PORT, EMAIL_USERNAME, EMAIL_PASSWORD, NODE_ENV } =
-  process.env;
+const {
+  NODEMAILER_HOST,
+  NODEMAILER_PORT,
+  NODEMAILER_USERNAME,
+  NODEMAILER_PASSWORD,
+  NODE_ENV,
+} = process.env;
 
 export const transporter = nodemailer.createTransport({
-  host: EMAIL_HOST,
-  port: EMAIL_PORT,
+  host: NODEMAILER_HOST,
+  port: NODEMAILER_PORT,
   secure: NODE_ENV === 'production',
   auth: {
-    user: EMAIL_USERNAME,
-    pass: EMAIL_PASSWORD,
+    user: NODEMAILER_USERNAME,
+    pass: NODEMAILER_PASSWORD,
   },
 });
