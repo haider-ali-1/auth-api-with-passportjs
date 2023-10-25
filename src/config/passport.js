@@ -13,7 +13,7 @@ const handleOAuthUser = async (done, { profile, refreshToken }) => {
   if (user) {
     if (user.registerMethod === USER_REGISTER_METHODS.EMAIL_PASSWORD) {
       const error = new createError.Conflict(
-        `you already signup using email and password please use email & password for login`
+        `you had signed up using email and password please use email & password for login`
       );
       done(error);
     }
